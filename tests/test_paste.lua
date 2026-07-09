@@ -71,3 +71,84 @@ t.test("insert insert-mode uses characterwise put", function()
   t.eq(call.type, "c")
   t.eq(call.after, true)
 end)
+
+t.test("markdown buffer inserts converted html", function()
+  t.reset("yankdown.paste")
+  vim.bo.filetype = "markdown"
+  local old_schedule = vim.schedule
+  vim.schedule = function(fn) fn() end
+  package.loaded["yankdown.clipboard"] = {
+    read_html = function(cb) cb("<p>Hello</p>", nil) end,
+  }
+  package.loaded["yankdown.convert"] = {
+    html_to_markdown = function(html, cb)
+      t.eq(html, "<p>Hello</p>")
+      cb("Hello", nil)
+    end,
+  }
+  package.loaded["yankdown.native"] = {
+    paste = function() error("native paste should not run") end,
+  }
+  local paste = require("yankdown.paste")
+  local old_insert = paste.insert
+  local inserted
+  paste.insert = function(markdown, direction) inserted = { markdown = markdown, direction = direction } end
+  paste.start({ direction = "after" }, { notify = false })
+  paste.insert = old_insert
+  vim.schedule = old_schedule
+  package.loaded["yankdown.clipboard"] = nil
+  package.loaded["yankdown.convert"] = nil
+  package.loaded["yankdown.native"] = nil
+  t.eq(inserted.markdown, "Hello")
+  t.eq(inserted.direction, "after")
+end)
+
+t.test("no html falls back silently", function()
+  t.reset("yankdown.paste")
+  vim.bo.filetype = "markdown"
+  local old_schedule = vim.schedule
+  vim.schedule = function(fn) fn() end
+  package.loaded["yankdown.clipboard"] = {
+    read_html = function(cb) cb(nil, "no-html") end,
+  }
+  package.loaded["yankdown.native"] = {
+    paste = function(direction) _G.__fallback_direction = direction end,
+  }
+  require("yankdown.paste").start({ direction = "before" }, { notify = true })
+  vim.schedule = old_schedule
+  package.loaded["yankdown.clipboard"] = nil
+  package.loaded["yankdown.native"] = nil
+  t.eq(_G.__fallback_direction, "before")
+  _G.__fallback_direction = nil
+end)
+
+t.test("missing pandoc warns once", function()
+  t.reset("yankdown.paste")
+  vim.bo.filetype = "markdown"
+  local notices = 0
+  local old_notify = vim.notify
+  local old_schedule = vim.schedule
+  vim.schedule = function(fn) fn() end
+  vim.notify = function(msg, level)
+    notices = notices + 1
+    t.ok(msg:match("pandoc"), "notification mentions pandoc")
+  end
+  package.loaded["yankdown.clipboard"] = {
+    read_html = function(cb) cb("<p>Hello</p>", nil) end,
+  }
+  package.loaded["yankdown.convert"] = {
+    html_to_markdown = function(html, cb) cb(nil, "missing-pandoc") end,
+  }
+  package.loaded["yankdown.native"] = {
+    paste = function() end,
+  }
+  local paste = require("yankdown.paste")
+  paste.start({ direction = "after" }, { notify = true })
+  paste.start({ direction = "after" }, { notify = true })
+  vim.notify = old_notify
+  vim.schedule = old_schedule
+  package.loaded["yankdown.clipboard"] = nil
+  package.loaded["yankdown.convert"] = nil
+  package.loaded["yankdown.native"] = nil
+  t.eq(notices, 1)
+end)

@@ -4,4 +4,5 @@ package.path = vim.fn.getcwd() .. "/tests/?.lua;" .. package.path
 require("test_init")
 require("test_paste")
 require("test_clipboard")
+require("test_convert")
 require("tests.minitest").run()

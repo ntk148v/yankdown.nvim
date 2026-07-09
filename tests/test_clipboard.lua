@@ -44,3 +44,54 @@ t.test("unsupported Windows returns nil", function()
     t.eq(err, "unsupported")
   end)
 end)
+
+t.test("read_html returns stdout HTML", function()
+  t.reset("yankdown.clipboard")
+  local old_system = vim.system
+  local old_schedule = vim.schedule
+  vim.schedule = function(fn) fn() end
+  vim.system = function(cmd, opts, on_exit)
+    t.eq(cmd[1], "wl-paste")
+    on_exit({ code = 0, stdout = "<p>Hello</p>", stderr = "" })
+    return {}
+  end
+  local clipboard = require("yankdown.clipboard")
+  local old_provider = clipboard.provider
+  clipboard.provider = function()
+    return { name = "wayland", command = { "wl-paste", "-t", "text/html" } }
+  end
+  local html, err
+  clipboard.read_html(function(result, reason)
+    html, err = result, reason
+  end)
+  clipboard.provider = old_provider
+  vim.system = old_system
+  vim.schedule = old_schedule
+  t.eq(html, "<p>Hello</p>")
+  t.eq(err, nil)
+end)
+
+t.test("read_html treats empty stdout as no-html", function()
+  t.reset("yankdown.clipboard")
+  local old_system = vim.system
+  local old_schedule = vim.schedule
+  vim.schedule = function(fn) fn() end
+  vim.system = function(cmd, opts, on_exit)
+    on_exit({ code = 0, stdout = "", stderr = "" })
+    return {}
+  end
+  local clipboard = require("yankdown.clipboard")
+  local old_provider = clipboard.provider
+  clipboard.provider = function()
+    return { name = "x11", command = { "xclip", "-selection", "clipboard", "-t", "text/html", "-o" } }
+  end
+  local html, err
+  clipboard.read_html(function(result, reason)
+    html, err = result, reason
+  end)
+  clipboard.provider = old_provider
+  vim.system = old_system
+  vim.schedule = old_schedule
+  t.eq(html, nil)
+  t.eq(err, "no-html")
+end)

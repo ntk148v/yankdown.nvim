@@ -48,4 +48,29 @@ function M.provider()
   return nil, "unsupported"
 end
 
+function M.read_html(callback)
+  local provider, err = M.provider()
+  if not provider then
+    callback(nil, err)
+    return
+  end
+
+  vim.system(provider.command, { text = true }, function(result)
+    vim.schedule(function()
+      if result.code ~= 0 then
+        callback(nil, "clipboard-failed")
+        return
+      end
+
+      local stdout = result.stdout or ""
+      if stdout == "" then
+        callback(nil, "no-html")
+        return
+      end
+
+      callback(stdout, nil)
+    end)
+  end)
+end
+
 return M

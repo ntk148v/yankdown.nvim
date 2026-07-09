@@ -31,3 +31,26 @@ t.test("paste delegates to paste module", function()
   _G.__yankdown_paste_call = nil
   package.loaded["yankdown.paste"] = nil
 end)
+
+t.test("auto_intercept false does not create autocmd", function()
+  t.reset("yankdown")
+  local old_create_autocmd = vim.api.nvim_create_autocmd
+  local created = false
+  vim.api.nvim_create_autocmd = function() created = true end
+  require("yankdown").setup({ auto_intercept = false })
+  vim.api.nvim_create_autocmd = old_create_autocmd
+  t.eq(created, false)
+end)
+
+t.test("auto_intercept true creates markdown filetype autocmd", function()
+  t.reset("yankdown")
+  local old_create_autocmd = vim.api.nvim_create_autocmd
+  local autocmd
+  vim.api.nvim_create_autocmd = function(event, opts)
+    autocmd = { event = event, opts = opts }
+  end
+  require("yankdown").setup({ auto_intercept = true })
+  vim.api.nvim_create_autocmd = old_create_autocmd
+  t.eq(autocmd.event, "FileType")
+  t.eq(autocmd.opts.pattern, "markdown")
+end)

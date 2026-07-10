@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # collect commits since last tag
+          PREV=$(git tag --sort=-creatordate | sed -n '2p')
+          if [ -z "$PREV" ]; then
+            LOG=$(git log --oneline --no-decorate "HEAD")
+          else
+            LOG=$(git log --oneline --no-decorate "$PREV..HEAD")
+          fi
+          # format as markdown bullet list
+          CHANGELOG=$(echo "$LOG" | sed 's/^/* /')
+          delimiter="$(openssl rand -hex 8)"
+          echo "body<<$delimiter" >> "$GITHUB_OUTPUT"
+          echo "## What's Changed" >> "$GITHUB_OUTPUT"
+          echo "$CHANGELOG" >> "$GITHUB_OUTPUT"
+          echo "$delimiter" >> "$GITHUB_OUTPUT"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ steps.changelog.outputs.body }}
+          generate_release_notes: false

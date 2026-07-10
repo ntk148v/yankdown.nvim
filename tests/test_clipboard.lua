@@ -97,6 +97,34 @@ t.test("read_html returns stdout HTML", function()
   t.eq(err, nil)
 end)
 
+t.test("read_html accepts Windows fragment stdout", function()
+  t.reset("yankdown.clipboard")
+  local old_system = vim.system
+  local old_schedule = vim.schedule
+  vim.schedule = function(fn)
+    fn()
+  end
+  vim.system = function(cmd, opts, on_exit)
+    t.eq(cmd[1], "powershell")
+    on_exit({ code = 0, stdout = "<h1>Hello</h1>", stderr = "" })
+    return {}
+  end
+  local clipboard = require("yankdown.clipboard")
+  local old_provider = clipboard.provider
+  clipboard.provider = function()
+    return { name = "windows", command = { "powershell", "-NoProfile", "-NonInteractive", "-Command", "script" } }
+  end
+  local html, err
+  clipboard.read_html(function(result, reason)
+    html, err = result, reason
+  end)
+  clipboard.provider = old_provider
+  vim.system = old_system
+  vim.schedule = old_schedule
+  t.eq(html, "<h1>Hello</h1>")
+  t.eq(err, nil)
+end)
+
 t.test("read_html treats empty stdout as no-html", function()
   t.reset("yankdown.clipboard")
   local old_system = vim.system

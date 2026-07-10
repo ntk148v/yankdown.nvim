@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Neovim and Lua tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lua5.1 luarocks neovim
+          sudo luarocks install luacheck
+
+      - name: Install StyLua
+        uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: --version
+
+      - name: Format check
+        run: stylua --check lua tests scripts
+
+      - name: Lint
+        run: luacheck lua tests scripts
+
+      - name: Tests
+        run: nvim --headless -u NONE -l tests/run.lua
+
+      - name: Benchmark smoke
+        run: nvim --headless -u NONE -l scripts/benchmark.lua

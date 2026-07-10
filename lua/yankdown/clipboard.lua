@@ -12,7 +12,7 @@ function M.provider()
         command = {
           "osascript",
           "-e",
-          'the clipboard as «class HTML»',
+          "the clipboard as «class HTML»",
         },
       }
     end

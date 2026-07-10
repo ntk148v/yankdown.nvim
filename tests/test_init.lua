@@ -36,7 +36,9 @@ t.test("auto_intercept false does not create autocmd", function()
   t.reset("yankdown")
   local old_create_autocmd = vim.api.nvim_create_autocmd
   local created = false
-  vim.api.nvim_create_autocmd = function() created = true end
+  vim.api.nvim_create_autocmd = function()
+    created = true
+  end
   require("yankdown").setup({ auto_intercept = false })
   vim.api.nvim_create_autocmd = old_create_autocmd
   t.eq(created, false)

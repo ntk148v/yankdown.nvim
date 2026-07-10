@@ -2,8 +2,12 @@ local t = require("tests.minitest")
 
 local function with_env(env, executable, fn)
   local old_has, old_executable, old_env = vim.fn.has, vim.fn.executable, vim.env
-  vim.fn.has = function(name) return env.has[name] or 0 end
-  vim.fn.executable = function(name) return executable[name] and 1 or 0 end
+  vim.fn.has = function(name)
+    return env.has[name] or 0
+  end
+  vim.fn.executable = function(name)
+    return executable[name] and 1 or 0
+  end
   vim.env = vim.tbl_extend("force", vim.env, env.vars or {})
   fn()
   vim.fn.has, vim.fn.executable, vim.env = old_has, old_executable, old_env
@@ -49,7 +53,9 @@ t.test("read_html returns stdout HTML", function()
   t.reset("yankdown.clipboard")
   local old_system = vim.system
   local old_schedule = vim.schedule
-  vim.schedule = function(fn) fn() end
+  vim.schedule = function(fn)
+    fn()
+  end
   vim.system = function(cmd, opts, on_exit)
     t.eq(cmd[1], "wl-paste")
     on_exit({ code = 0, stdout = "<p>Hello</p>", stderr = "" })
@@ -75,7 +81,9 @@ t.test("read_html treats empty stdout as no-html", function()
   t.reset("yankdown.clipboard")
   local old_system = vim.system
   local old_schedule = vim.schedule
-  vim.schedule = function(fn) fn() end
+  vim.schedule = function(fn)
+    fn()
+  end
   vim.system = function(cmd, opts, on_exit)
     on_exit({ code = 0, stdout = "", stderr = "" })
     return {}

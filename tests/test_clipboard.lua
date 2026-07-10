@@ -117,6 +117,33 @@ t.test("read_html accepts Windows fragment stdout", function()
   t.eq(err, nil)
 end)
 
+t.test("read_html includes stderr on command failure", function()
+  t.reset("yankdown.clipboard")
+  local old_system = vim.system
+  local old_schedule = vim.schedule
+  vim.schedule = function(fn)
+    fn()
+  end
+  vim.system = function(cmd, opts, on_exit)
+    on_exit({ code = 1, stdout = "", stderr = "boom" })
+    return {}
+  end
+  local clipboard = require("yankdown.clipboard")
+  local old_provider = clipboard.provider
+  clipboard.provider = function()
+    return { name = "windows", command = { "powershell", "-NoProfile", "-STA", "-NonInteractive", "-Command", "script" } }
+  end
+  local html, err
+  clipboard.read_html(function(result, reason)
+    html, err = result, reason
+  end)
+  clipboard.provider = old_provider
+  vim.system = old_system
+  vim.schedule = old_schedule
+  t.eq(html, nil)
+  t.eq(err, "clipboard-failed: boom")
+end)
+
 t.test("read_html treats empty stdout as no-html", function()
   t.reset("yankdown.clipboard")
   local old_system = vim.system

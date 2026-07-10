@@ -185,6 +185,31 @@ t.test("missing pandoc warns once", function()
   t.eq(notices, 1)
 end)
 
+t.test("clipboard command failure shows stderr", function()
+  t.reset("yankdown.paste")
+  vim.bo.filetype = "markdown"
+  local notice
+  local old_notify = vim.notify
+  vim.notify = function(msg)
+    notice = msg
+  end
+  package.loaded["yankdown.clipboard"] = {
+    read_html = function(cb)
+      cb(nil, "clipboard-failed: boom")
+    end,
+  }
+  package.loaded["yankdown.native"] = {
+    paste = function() end,
+  }
+
+  require("yankdown.paste").start({ direction = "after" }, { notify = true })
+
+  vim.notify = old_notify
+  package.loaded["yankdown.clipboard"] = nil
+  package.loaded["yankdown.native"] = nil
+  t.ok(notice:match("boom"), "notification includes stderr")
+end)
+
 t.test("notify false suppresses fallback warnings", function()
   t.reset("yankdown.paste")
   vim.bo.filetype = "markdown"

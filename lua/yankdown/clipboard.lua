@@ -82,7 +82,8 @@ function M.read_html(callback)
   vim.system(provider.command, { text = true }, function(result)
     vim.schedule(function()
       if result.code ~= 0 then
-        callback(nil, "clipboard-failed")
+        local stderr = vim.trim(result.stderr or "")
+        callback(nil, stderr ~= "" and ("clipboard-failed: " .. stderr) or ("clipboard-failed: exit " .. result.code))
         return
       end
 

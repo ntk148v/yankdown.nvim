@@ -23,6 +23,9 @@ local function warn_once(reason, config)
   warned[reason] = true
 
   local msg = messages[reason]
+  if not msg and reason:match("^clipboard%-failed:") then
+    msg = "yankdown.nvim: HTML clipboard read failed (" .. reason:gsub("^clipboard%-failed:%s*", "") .. "); falling back to native paste"
+  end
   if msg then
     vim.notify(msg, vim.log.levels.WARN)
   end

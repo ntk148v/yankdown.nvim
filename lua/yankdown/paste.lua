@@ -6,6 +6,7 @@ local messages = {
   ["pandoc-failed"] = "yankdown.nvim: pandoc conversion failed; falling back to native paste",
   ["missing:osascript"] = "yankdown.nvim: osascript not found; falling back to native paste",
   ["missing:wl-paste"] = "yankdown.nvim: wl-paste not found; falling back to native paste",
+  ["missing:powershell"] = "yankdown.nvim: PowerShell not found; falling back to native paste",
   ["missing:xclip"] = "yankdown.nvim: xclip not found; falling back to native paste",
   ["clipboard-failed"] = "yankdown.nvim: HTML clipboard read failed; falling back to native paste",
   unsupported = "yankdown.nvim: HTML clipboard is unsupported on this platform; falling back to native paste",

@@ -108,7 +108,7 @@ Clipboard providers
 | macOS    | `osascript` | Built-in                    |
 | Wayland  | `wl-paste`  | From `wl-clipboard` package |
 | X11      | `xclip`     |                             |
-| Windows  | —           | Unsupported in v1           |
+| Windows  | PowerShell  | Built-in Windows clipboard API |
 
 ## 7. Installation
 
@@ -206,7 +206,6 @@ Native paste (as if yankdown.nvim were not installed) is used when:
 
 ## 11. Limitations (v1)
 
-- Windows clipboard HTML is not supported.
 - No built-in HTML-to-Markdown converter — depends on `pandoc`.
 - Paste counts and explicit register selection fall through to native paste.
 

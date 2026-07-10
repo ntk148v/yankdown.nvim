@@ -8,7 +8,26 @@
 
 </div>
 
-## Overview
+- [yankdown.nvim](#yankdownnvim)
+  - [1. Overview](#1-overview)
+  - [2. Demo](#2-demo)
+  - [3. How it works](#3-how-it-works)
+  - [4. Features](#4-features)
+  - [5. Architecture](#5-architecture)
+  - [6. Requirements](#6-requirements)
+  - [7. Installation](#7-installation)
+  - [8. Setup](#8-setup)
+  - [9. Usage](#9-usage)
+    - [9.1. Command](#91-command)
+    - [9.2. Lua](#92-lua)
+    - [9.3. Keymaps](#93-keymaps)
+    - [9.4. Plug mappings](#94-plug-mappings)
+    - [9.5. Optional paste interception](#95-optional-paste-interception)
+  - [10. Fallback behavior](#10-fallback-behavior)
+  - [11. Limitations (v1)](#11-limitations-v1)
+  - [12. Development](#12-development)
+
+## 1. Overview
 
 We're past peak prose. Every LLM outputs Markdown. Every answer, every code review, every draft — it's all `## headings`, `- lists`, and ``` backticks. You copy from a browser, a doc, an AI chat — and Neovim gets raw HTML or rich text. Which you then clean by hand. In 2026. While your AI writes in GFM natively.
 
@@ -16,7 +35,15 @@ We're past peak prose. Every LLM outputs Markdown. Every answer, every code revi
 
 It reads HTML from the system clipboard, pipes it through `pandoc`, and inserts the result at the cursor. When HTML is unavailable or a required tool is missing, it falls back to native paste transparently.
 
-## How it works
+## 2. Demo
+
+Copy the content from <https://pandoc.org/> and simply paste using yankdown.nvim.
+
+![demo](assets/demo.gif)
+
+_Recording generated with [VHS](https://github.com/charmbracelet/vhs) — see [`assets/demo.tape`](assets/demo.tape)._
+
+## 3. How it works
 
 ```mermaid
 flowchart TD
@@ -33,7 +60,7 @@ flowchart TD
     I -->|yes| K[Insert GFM at cursor]
 ```
 
-## Features
+## 4. Features
 
 - **Clipboard HTML → GFM** — paste rich content as clean Markdown, not raw HTML.
 - **Auto-fallback** — native paste when HTML is absent, pandoc is missing, or the platform is unsupported.
@@ -42,7 +69,7 @@ flowchart TD
 - **Optional paste interception** — `p`/`P` auto-override in Markdown buffers only (buffer-local, filetype-scoped).
 - **Plug mappings** — `<Plug>(yankdown-paste-after)` and `<Plug>(yankdown-paste-before)` for custom keybindings.
 
-## Architecture
+## 5. Architecture
 
 ```mermaid
 flowchart LR
@@ -67,14 +94,14 @@ flowchart LR
     P --> N
 ```
 
-## Requirements
+## 6. Requirements
 
 | Dependency                    | Version | Purpose                                 |
 | ----------------------------- | ------- | --------------------------------------- |
 | Neovim                        | 0.10+   | Uses `vim.system` for async shell calls |
 | [pandoc](https://pandoc.org/) | any     | HTML to GFM conversion engine           |
 
-### Clipboard providers
+Clipboard providers
 
 | Platform | Tool        | Notes                       |
 | -------- | ----------- | --------------------------- |
@@ -83,7 +110,7 @@ flowchart LR
 | X11      | `xclip`     |                             |
 | Windows  | —           | Unsupported in v1           |
 
-## Installation
+## 7. Installation
 
 With [lazy.nvim](https://github.com/folke/lazy.nvim):
 
@@ -106,7 +133,7 @@ With [packer.nvim](https://github.com/wbthomason/packer.nvim):
 use 'ntk148v/yankdown.nvim'
 ```
 
-## Setup
+## 8. Setup
 
 ```lua
 require("yankdown").setup({
@@ -115,30 +142,30 @@ require("yankdown").setup({
 })
 ```
 
-### Options
+Options
 
 | Key              | Default | Description                                                    |
 | ---------------- | ------- | -------------------------------------------------------------- |
 | `auto_intercept` | `false` | Buffer-local `p`/`P` override for Markdown filetype only.      |
 | `notify`         | `true`  | One-time `vim.notify` on missing tools or conversion failures. |
 
-## Usage
+## 9. Usage
 
-### Command
+### 9.1. Command
 
 ```vim
 :YankdownPaste       " paste after cursor
 :YankdownPaste!      " paste before cursor
 ```
 
-### Lua
+### 9.2. Lua
 
 ```lua
 require("yankdown").paste({ direction = "after" })
 require("yankdown").paste({ direction = "before" })
 ```
 
-### Keymaps
+### 9.3. Keymaps
 
 ```lua
 vim.keymap.set({ "n", "x", "i" }, "<leader>p", function()
@@ -146,14 +173,14 @@ vim.keymap.set({ "n", "x", "i" }, "<leader>p", function()
 end)
 ```
 
-### Plug mappings
+### 9.4. Plug mappings
 
 ```vim
 :map <leader>p <Plug>(yankdown-paste-after)
 :map <leader>P <Plug>(yankdown-paste-before)
 ```
 
-### Optional paste interception
+### 9.5. Optional paste interception
 
 Enable automatic interception of `p` and `P` in Markdown buffers:
 
@@ -165,7 +192,7 @@ require("yankdown").setup({
 
 This creates buffer-local mappings only for `filetype=markdown`. No global keys are touched.
 
-## Fallback behavior
+## 10. Fallback behavior
 
 Native paste (as if yankdown.nvim were not installed) is used when:
 
@@ -177,13 +204,13 @@ Native paste (as if yankdown.nvim were not installed) is used when:
 | Clipboard tool missing               | Warn once if `notify = true` |
 | `pandoc` missing or conversion fails | Warn once if `notify = true` |
 
-## Limitations (v1)
+## 11. Limitations (v1)
 
 - Windows clipboard HTML is not supported.
 - No built-in HTML-to-Markdown converter — depends on `pandoc`.
 - Paste counts and explicit register selection fall through to native paste.
 
-## Development
+## 12. Development
 
 ```sh
 # Run tests

@@ -22,7 +22,7 @@ local function windows_command(shell)
     "}",
   }, " ")
 
-  return { shell, "-NoProfile", "-NonInteractive", "-Command", script }
+  return { shell, "-NoProfile", "-STA", "-NonInteractive", "-Command", script }
 end
 
 function M.provider()
@@ -43,9 +43,6 @@ function M.provider()
   if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
     if executable("powershell") then
       return { name = "windows", command = windows_command("powershell") }
-    end
-    if executable("pwsh") then
-      return { name = "windows", command = windows_command("pwsh") }
     end
     return nil, "missing:powershell"
   end

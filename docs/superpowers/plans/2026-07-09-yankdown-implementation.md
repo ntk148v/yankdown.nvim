@@ -1398,9 +1398,472 @@ git commit -m "docs: document yankdown usage"
 
 ---
 
+## Maintenance Addendum: Performance, Cleanup, Tooling, and CI
+
+**Goal:** benchmark the hot in-process paths, keep only low-risk source simplifications, add formatter/linter checks, add one regression test, and run everything in CI.
+
+**Architecture:** the plugin is already thin; real paste latency is dominated by external clipboard tools and `pandoc`. Benchmark only the in-process Lua paths (`paste.insert` and `clipboard.provider`) so source cleanup can be checked for regressions without shelling out to platform tools.
+
+**Global Constraints:**
+
+- Do not add runtime dependencies.
+- CI-only tools are allowed: `stylua`, `luacheck`, and Neovim.
+- Benchmark output is informational; do not make CI fail on timing noise.
+- Keep optimizations only when tests pass and the after-benchmark is not slower by more than 10% locally.
+
+---
+
+### Task 10: Add Benchmark Script and Capture Baseline
+
+**Files:**
+
+- Create: `scripts/benchmark.lua`
+
+**Interfaces:**
+
+- Consumes: `require("yankdown.paste").insert(markdown, direction)` and `require("yankdown.clipboard").provider()`.
+- Produces: a runnable benchmark command: `nvim --headless -u NONE -l scripts/benchmark.lua`.
+
+- [ ] **Step 1: Create benchmark script**
+
+Create `scripts/benchmark.lua`:
+
+```lua
+vim.opt.runtimepath:prepend(vim.fn.getcwd())
+
+local paste = require("yankdown.paste")
+local clipboard = require("yankdown.clipboard")
+
+local function bench(name, iterations, fn)
+  collectgarbage("collect")
+  local started = vim.loop.hrtime()
+  for _ = 1, iterations do
+    fn()
+  end
+  local elapsed_ms = (vim.loop.hrtime() - started) / 1000000
+  print(("%s\t%.6f"):format(name, elapsed_ms / iterations))
+end
+
+print("benchmark\tms_per_op")
+
+local markdown = table.concat({
+  "# Heading",
+  "",
+  "- one",
+  "- two",
+  "- three",
+  "",
+  "A short paragraph with **bold** text.",
+}, "\n")
+
+local old_mode = vim.api.nvim_get_mode
+local old_put = vim.api.nvim_put
+vim.api.nvim_get_mode = function()
+  return { mode = "n" }
+end
+vim.api.nvim_put = function() end
+
+bench("paste_insert_normal", 10000, function()
+  paste.insert(markdown, "after")
+end)
+
+vim.api.nvim_get_mode = old_mode
+vim.api.nvim_put = old_put
+
+local old_has = vim.fn.has
+local old_executable = vim.fn.executable
+local old_wayland = vim.env.WAYLAND_DISPLAY
+local old_display = vim.env.DISPLAY
+
+vim.fn.has = function()
+  return 0
+end
+vim.fn.executable = function(name)
+  return name == "wl-paste" and 1 or 0
+end
+vim.env.WAYLAND_DISPLAY = "wayland-0"
+vim.env.DISPLAY = nil
+
+bench("clipboard_provider_wayland", 10000, function()
+  local provider, err = clipboard.provider()
+  if err or not provider or provider.name ~= "wayland" then
+    error("expected wayland provider")
+  end
+end)
+
+vim.fn.has = old_has
+vim.fn.executable = old_executable
+vim.env.WAYLAND_DISPLAY = old_wayland
+vim.env.DISPLAY = old_display
+```
+
+- [ ] **Step 2: Run baseline benchmark**
+
+Run:
+
+```bash
+nvim --headless -u NONE -l scripts/benchmark.lua | tee /tmp/yankdown-bench-before.tsv
+```
+
+Expected: output has this header and two numeric rows:
+
+```text
+benchmark	ms_per_op
+paste_insert_normal	<number>
+clipboard_provider_wayland	<number>
+```
+
+- [ ] **Step 3: Commit benchmark script**
+
+```bash
+git add scripts/benchmark.lua
+git commit -m "test: add benchmark script"
+```
+
+---
+
+### Task 11: Remove Redundant Paste Helpers Without Changing Behavior
+
+**Files:**
+
+- Modify: `lua/yankdown/paste.lua`
+- Test: `tests/test_paste.lua`
+
+**Interfaces:**
+
+- Consumes: existing `paste.start(opts, config)` and `paste.insert(markdown, direction)` public module functions.
+- Produces: same function signatures; warning messages table is hoisted once per module load, and the one-line `fallback()` wrapper is removed.
+
+- [ ] **Step 1: Add regression test for warning suppression**
+
+Append this test to `tests/test_paste.lua`, before the end of the file:
+
+```lua
+t.test("notify false suppresses fallback warnings", function()
+  t.reset("yankdown.paste")
+  vim.bo.filetype = "markdown"
+  local notices = 0
+  local old_notify = vim.notify
+  vim.notify = function()
+    notices = notices + 1
+  end
+  package.loaded["yankdown.clipboard"] = {
+    read_html = function(cb)
+      cb("<p>Hello</p>", nil)
+    end,
+  }
+  package.loaded["yankdown.convert"] = {
+    html_to_markdown = function(_, cb)
+      cb(nil, "missing-pandoc")
+    end,
+  }
+  package.loaded["yankdown.native"] = {
+    paste = function() end,
+  }
+
+  require("yankdown.paste").start({ direction = "after" }, { notify = false })
+
+  vim.notify = old_notify
+  package.loaded["yankdown.clipboard"] = nil
+  package.loaded["yankdown.convert"] = nil
+  package.loaded["yankdown.native"] = nil
+  t.eq(notices, 0)
+end)
+```
+
+- [ ] **Step 2: Run test to verify current behavior**
+
+Run:
+
+```bash
+nvim --headless -u NONE -l tests/run.lua
+```
+
+Expected: every test prints `PASS`, including `PASS notify false suppresses fallback warnings`.
+
+- [ ] **Step 3: Replace `lua/yankdown/paste.lua` with cleaned implementation**
+
+```lua
+local M = {}
+local warned = {}
+
+local messages = {
+  ["missing-pandoc"] = "yankdown.nvim: pandoc not found; falling back to native paste",
+  ["pandoc-failed"] = "yankdown.nvim: pandoc conversion failed; falling back to native paste",
+  ["missing:osascript"] = "yankdown.nvim: osascript not found; falling back to native paste",
+  ["missing:wl-paste"] = "yankdown.nvim: wl-paste not found; falling back to native paste",
+  ["missing:xclip"] = "yankdown.nvim: xclip not found; falling back to native paste",
+  ["clipboard-failed"] = "yankdown.nvim: HTML clipboard read failed; falling back to native paste",
+  unsupported = "yankdown.nvim: HTML clipboard is unsupported on this platform; falling back to native paste",
+}
+
+local function direction(opts)
+  return opts.direction == "before" and "before" or "after"
+end
+
+local function warn_once(reason, config)
+  if not config.notify or warned[reason] then
+    return
+  end
+  warned[reason] = true
+
+  local msg = messages[reason]
+  if msg then
+    vim.notify(msg, vim.log.levels.WARN)
+  end
+end
+
+local function lines(markdown)
+  markdown = markdown:gsub("\r", "")
+  return vim.split(markdown, "\n", { plain = true, trimempty = true })
+end
+
+function M.insert(markdown, dir)
+  local mode = vim.api.nvim_get_mode().mode
+  local out = lines(markdown)
+
+  if mode:match("^[vV\22]") then
+    local start_pos = vim.fn.getpos("'<")
+    local end_pos = vim.fn.getpos("'>")
+    vim.api.nvim_buf_set_text(0, start_pos[2] - 1, start_pos[3] - 1, end_pos[2] - 1, end_pos[3], out)
+    return
+  end
+
+  if mode:sub(1, 1) == "i" then
+    vim.api.nvim_put(out, "c", true, true)
+    return
+  end
+
+  vim.api.nvim_put(out, "l", dir ~= "before", true)
+end
+
+function M.start(opts, config)
+  local dir = direction(opts or {})
+  config = config or { notify = true }
+
+  if vim.bo.filetype ~= "markdown" then
+    require("yankdown.native").paste(dir)
+    return
+  end
+
+  require("yankdown.clipboard").read_html(function(html, clipboard_err)
+    if not html then
+      if clipboard_err ~= "no-html" then
+        warn_once(clipboard_err, config)
+      end
+      require("yankdown.native").paste(dir)
+      return
+    end
+
+    require("yankdown.convert").html_to_markdown(html, function(markdown, convert_err)
+      if not markdown then
+        warn_once(convert_err, config)
+        require("yankdown.native").paste(dir)
+        return
+      end
+
+      M.insert(markdown, dir)
+    end)
+  end)
+end
+
+return M
+```
+
+- [ ] **Step 4: Run tests after cleanup**
+
+Run:
+
+```bash
+nvim --headless -u NONE -l tests/run.lua
+```
+
+Expected: every test prints `PASS` and Neovim exits with status 0.
+
+- [ ] **Step 5: Run after benchmark and compare**
+
+Run:
+
+```bash
+nvim --headless -u NONE -l scripts/benchmark.lua | tee /tmp/yankdown-bench-after.tsv
+awk 'NR==FNR && NR>1 { before[$1]=$2; next } NR>1 { printf "%s before=%s after=%s change=%+.1f%%\n", $1, before[$1], $2, (($2 - before[$1]) / before[$1]) * 100 }' /tmp/yankdown-bench-before.tsv /tmp/yankdown-bench-after.tsv
+```
+
+Expected: both benchmark names print. Keep the cleanup if each local change is less than `+10.0%`; revert `lua/yankdown/paste.lua` if either row is slower by `+10.0%` or more.
+
+- [ ] **Step 6: Commit cleanup and regression test**
+
+```bash
+git add lua/yankdown/paste.lua tests/test_paste.lua
+git commit -m "refactor: simplify paste fallback handling"
+```
+
+---
+
+### Task 12: Add Format and Lint Configuration
+
+**Files:**
+
+- Create: `.stylua.toml`
+- Create: `.luacheckrc`
+
+**Interfaces:**
+
+- Produces: `stylua --check lua tests scripts` and `luacheck lua tests scripts` as local/CI commands.
+
+- [ ] **Step 1: Add StyLua config**
+
+Create `.stylua.toml`:
+
+```toml
+column_width = 120
+indent_type = "Spaces"
+indent_width = 2
+quote_style = "AutoPreferDouble"
+call_parentheses = "Always"
+```
+
+- [ ] **Step 2: Add luacheck config**
+
+Create `.luacheckrc`:
+
+```lua
+std = "lua51"
+globals = { "vim" }
+unused_args = false
+max_line_length = false
+```
+
+- [ ] **Step 3: Run formatter**
+
+Run:
+
+```bash
+stylua lua tests scripts
+```
+
+Expected: command exits with status 0. If `stylua` is missing, install it locally with the package manager you already use; do not commit installer output or generated caches.
+
+- [ ] **Step 4: Run format check**
+
+Run:
+
+```bash
+stylua --check lua tests scripts
+```
+
+Expected: command exits with status 0.
+
+- [ ] **Step 5: Run lint**
+
+Run:
+
+```bash
+luacheck lua tests scripts
+```
+
+Expected: command exits with status 0 and reports no warnings.
+
+- [ ] **Step 6: Run tests**
+
+Run:
+
+```bash
+nvim --headless -u NONE -l tests/run.lua
+```
+
+Expected: every test prints `PASS` and Neovim exits with status 0.
+
+- [ ] **Step 7: Commit tooling config**
+
+```bash
+git add .stylua.toml .luacheckrc lua tests scripts
+git commit -m "chore: add lua format and lint checks"
+```
+
+---
+
+### Task 13: Add CI Job for Format, Lint, Tests, and Benchmark Smoke
+
+**Files:**
+
+- Create: `.github/workflows/ci.yml`
+
+**Interfaces:**
+
+- Consumes: `.stylua.toml`, `.luacheckrc`, `tests/run.lua`, and `scripts/benchmark.lua`.
+- Produces: GitHub Actions workflow named `CI`.
+
+- [ ] **Step 1: Create CI workflow**
+
+Create `.github/workflows/ci.yml`:
+
+```yaml
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Neovim and Lua tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lua5.1 luarocks neovim
+          sudo luarocks install luacheck
+
+      - name: Install StyLua
+        uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: --version
+
+      - name: Format check
+        run: stylua --check lua tests scripts
+
+      - name: Lint
+        run: luacheck lua tests scripts
+
+      - name: Tests
+        run: nvim --headless -u NONE -l tests/run.lua
+
+      - name: Benchmark smoke
+        run: nvim --headless -u NONE -l scripts/benchmark.lua
+```
+
+- [ ] **Step 2: Run CI commands locally in the same order**
+
+Run:
+
+```bash
+stylua --check lua tests scripts
+luacheck lua tests scripts
+nvim --headless -u NONE -l tests/run.lua
+nvim --headless -u NONE -l scripts/benchmark.lua
+```
+
+Expected: all four commands exit with status 0. The benchmark prints timing rows; do not compare timing in CI.
+
+- [ ] **Step 3: Commit CI workflow**
+
+```bash
+git add .github/workflows/ci.yml
+git commit -m "ci: add format lint test workflow"
+```
+
+---
+
 ## Self-Review Notes
 
-- Spec coverage: public API, safe defaults, macOS/Linux providers, unsupported Windows, Pandoc-only conversion, async shell calls, fallback behavior, mode-aware insertion, warn-once notifications, and focused tests are all covered by tasks.
+- Spec coverage: public API, safe defaults, macOS/Linux providers, unsupported Windows, Pandoc-only conversion, async shell calls, fallback behavior, mode-aware insertion, warn-once notifications, focused tests, benchmark script, source cleanup, formatter/linter config, and CI are all covered by tasks.
 - Placeholder scan: no placeholder task steps remain; each code-changing step includes concrete file content or concrete patch content.
-- Type consistency: `setup`, `paste`, `clipboard.provider`, `clipboard.read_html`, `convert.html_to_markdown`, `paste.start`, `paste.insert`, and `native.paste` signatures are consistent across tasks.
-- Scope check: this is one coherent plugin v1; Windows and custom converters remain documented extension points, not implementation tasks.
+- Type consistency: `setup`, `paste`, `clipboard.provider`, `clipboard.read_html`, `convert.html_to_markdown`, `paste.start`, `paste.insert`, and `native.paste` signatures are consistent across tasks. The maintenance addendum preserves existing public signatures.
+- Scope check: this is one coherent plugin v1 plus a maintenance/tooling addendum; Windows and custom converters remain documented extension points, not implementation tasks.

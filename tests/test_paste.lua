@@ -152,3 +152,34 @@ t.test("missing pandoc warns once", function()
   package.loaded["yankdown.native"] = nil
   t.eq(notices, 1)
 end)
+
+t.test("notify false suppresses fallback warnings", function()
+  t.reset("yankdown.paste")
+  vim.bo.filetype = "markdown"
+  local notices = 0
+  local old_notify = vim.notify
+  vim.notify = function()
+    notices = notices + 1
+  end
+  package.loaded["yankdown.clipboard"] = {
+    read_html = function(cb)
+      cb("<p>Hello</p>", nil)
+    end,
+  }
+  package.loaded["yankdown.convert"] = {
+    html_to_markdown = function(_, cb)
+      cb(nil, "missing-pandoc")
+    end,
+  }
+  package.loaded["yankdown.native"] = {
+    paste = function() end,
+  }
+
+  require("yankdown.paste").start({ direction = "after" }, { notify = false })
+
+  vim.notify = old_notify
+  package.loaded["yankdown.clipboard"] = nil
+  package.loaded["yankdown.convert"] = nil
+  package.loaded["yankdown.native"] = nil
+  t.eq(notices, 0)
+end)

@@ -1,12 +1,18 @@
 local M = {}
 local warned = {}
 
+local messages = {
+  ["missing-pandoc"] = "yankdown.nvim: pandoc not found; falling back to native paste",
+  ["pandoc-failed"] = "yankdown.nvim: pandoc conversion failed; falling back to native paste",
+  ["missing:osascript"] = "yankdown.nvim: osascript not found; falling back to native paste",
+  ["missing:wl-paste"] = "yankdown.nvim: wl-paste not found; falling back to native paste",
+  ["missing:xclip"] = "yankdown.nvim: xclip not found; falling back to native paste",
+  ["clipboard-failed"] = "yankdown.nvim: HTML clipboard read failed; falling back to native paste",
+  unsupported = "yankdown.nvim: HTML clipboard is unsupported on this platform; falling back to native paste",
+}
+
 local function direction(opts)
   return opts.direction == "before" and "before" or "after"
-end
-
-local function fallback(dir)
-  require("yankdown.native").paste(dir)
 end
 
 local function warn_once(reason, config)
@@ -14,16 +20,6 @@ local function warn_once(reason, config)
     return
   end
   warned[reason] = true
-
-  local messages = {
-    ["missing-pandoc"] = "yankdown.nvim: pandoc not found; falling back to native paste",
-    ["pandoc-failed"] = "yankdown.nvim: pandoc conversion failed; falling back to native paste",
-    ["missing:osascript"] = "yankdown.nvim: osascript not found; falling back to native paste",
-    ["missing:wl-paste"] = "yankdown.nvim: wl-paste not found; falling back to native paste",
-    ["missing:xclip"] = "yankdown.nvim: xclip not found; falling back to native paste",
-    ["clipboard-failed"] = "yankdown.nvim: HTML clipboard read failed; falling back to native paste",
-    unsupported = "yankdown.nvim: HTML clipboard is unsupported on this platform; falling back to native paste",
-  }
 
   local msg = messages[reason]
   if msg then
@@ -60,7 +56,7 @@ function M.start(opts, config)
   config = config or { notify = true }
 
   if vim.bo.filetype ~= "markdown" then
-    fallback(dir)
+    require("yankdown.native").paste(dir)
     return
   end
 
@@ -69,14 +65,14 @@ function M.start(opts, config)
       if clipboard_err ~= "no-html" then
         warn_once(clipboard_err, config)
       end
-      fallback(dir)
+      require("yankdown.native").paste(dir)
       return
     end
 
     require("yankdown.convert").html_to_markdown(html, function(markdown, convert_err)
       if not markdown then
         warn_once(convert_err, config)
-        fallback(dir)
+        require("yankdown.native").paste(dir)
         return
       end
 

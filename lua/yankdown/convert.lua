@@ -5,7 +5,7 @@ local pandoc_args = {
   "-f",
   "html",
   "-t",
-  "markdown_strict+gfm_markdown_blocks+pipe_tables",
+  "gfm-raw_html",
   "--wrap=none",
 }
 

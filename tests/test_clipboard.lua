@@ -120,7 +120,9 @@ t.test("read_html applies provider parse to CF_HTML stdout", function()
   t.reset("yankdown.clipboard")
   local old_system = vim.system
   local old_schedule = vim.schedule
-  vim.schedule = function(fn) fn() end
+  vim.schedule = function(fn)
+    fn()
+  end
   local cf_html = table.concat({
     "Version:0.9\r\n",
     "StartHTML:0000000103\r\n",

@@ -30,7 +30,8 @@ end
 t.test("cf_html extracts StartFragment/EndFragment range", function()
   local parse = require("yankdown.cf_html").parse
   local body = "<!--StartFragment--><p>Hello</p><!--EndFragment-->"
-  local start_body = #("Version:0.9\r\nStartHTML:0000000000\r\nEndHTML:0000000000\r\nStartFragment:0000000000\r\nEndFragment:0000000000\r\n")
+  local start_body =
+    #"Version:0.9\r\nStartHTML:0000000000\r\nEndHTML:0000000000\r\nStartFragment:0000000000\r\nEndFragment:0000000000\r\n"
   local payload, _ = cf_html_payload({
     StartHTML = start_body,
     EndHTML = start_body + #body,
@@ -48,7 +49,7 @@ end)
 t.test("cf_html falls back to StartHTML/EndHTML when fragment missing", function()
   local parse = require("yankdown.cf_html").parse
   local body = "<html><body><p>Hello</p></body></html>"
-  local start_body = #("Version:0.9\r\nStartHTML:0000000000\r\nEndHTML:0000000000\r\n")
+  local start_body = #"Version:0.9\r\nStartHTML:0000000000\r\nEndHTML:0000000000\r\n"
   local payload, _ = cf_html_payload({
     StartHTML = start_body,
     EndHTML = start_body + #body,
@@ -112,7 +113,8 @@ end)
 t.test("cf_html returns trimmed fragment when markers are at edges", function()
   local parse = require("yankdown.cf_html").parse
   local body = "<!--StartFragment--><b>Hi</b><!--EndFragment-->"
-  local start_body = #("Version:0.9\r\nStartHTML:0000000000\r\nEndHTML:0000000000\r\nStartFragment:0000000000\r\nEndFragment:0000000000\r\n")
+  local start_body =
+    #"Version:0.9\r\nStartHTML:0000000000\r\nEndHTML:0000000000\r\nStartFragment:0000000000\r\nEndFragment:0000000000\r\n"
   local payload, _ = cf_html_payload({
     StartHTML = start_body,
     EndHTML = start_body + #body,
@@ -127,7 +129,8 @@ end)
 
 t.test("cf_html handles missing body gracefully", function()
   local parse = require("yankdown.cf_html").parse
-  local start_body = #("Version:0.9\r\nStartHTML:0000000000\r\nEndHTML:0000000000\r\nStartFragment:0000000000\r\nEndFragment:0000000000\r\n")
+  local start_body =
+    #"Version:0.9\r\nStartHTML:0000000000\r\nEndHTML:0000000000\r\nStartFragment:0000000000\r\nEndFragment:0000000000\r\n"
   local payload, _ = cf_html_payload({
     StartHTML = start_body,
     EndHTML = start_body,

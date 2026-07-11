@@ -20,7 +20,25 @@ function M.provider()
   end
 
   if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
-    return nil, "unsupported"
+    if executable("powershell.exe") then
+      return {
+        name = "windows",
+        command = {
+          "powershell.exe",
+          "-NoProfile",
+          "-NonInteractive",
+          "-STA",
+          "-Command",
+          table.concat({
+            "Add-Type -AssemblyName System.Windows.Forms;",
+            [=[$html = [System.Windows.Forms.Clipboard]::GetText([System.Windows.Forms.TextDataFormat]::Html);]=],
+            [=[if ($html) { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; [Console]::Write($html) }]=],
+          }, " "),
+        },
+        parse = require("yankdown.cf_html").parse,
+      }
+    end
+    return nil, "missing:powershell"
   end
 
   if vim.env.WAYLAND_DISPLAY and executable("wl-paste") then
@@ -65,6 +83,13 @@ function M.read_html(callback)
       local stdout = result.stdout or ""
       if stdout == "" then
         callback(nil, "no-html")
+        return
+      end
+
+      -- Apply a provider-specific parser (e.g., CF_HTML for Windows).
+      if provider.parse then
+        local html, perr = provider.parse(stdout)
+        callback(html, perr)
         return
       end
 

@@ -1,0 +1,1150 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "test_check.lua",
+      "file_type": "code",
+      "source_file": "tests/test_check.lua",
+      "source_location": "L1",
+      "id": "test_check",
+      "community": 0
+    },
+    {
+      "label": "with_env()",
+      "file_type": "code",
+      "source_file": "tests/test_check.lua",
+      "source_location": "L8",
+      "id": "test_check_with_env",
+      "community": 0
+    },
+    {
+      "label": "minitest.lua",
+      "file_type": "code",
+      "source_file": "tests/minitest.lua",
+      "source_location": "L1",
+      "id": "minitest",
+      "community": 0
+    },
+    {
+      "label": "M.test()",
+      "file_type": "code",
+      "source_file": "tests/minitest.lua",
+      "source_location": "L3",
+      "id": "minitest_m_test",
+      "community": 0
+    },
+    {
+      "label": "M.eq()",
+      "file_type": "code",
+      "source_file": "tests/minitest.lua",
+      "source_location": "L7",
+      "id": "minitest_m_eq",
+      "community": 0
+    },
+    {
+      "label": "M.ok()",
+      "file_type": "code",
+      "source_file": "tests/minitest.lua",
+      "source_location": "L13",
+      "id": "minitest_m_ok",
+      "community": 0
+    },
+    {
+      "label": "M.reset()",
+      "file_type": "code",
+      "source_file": "tests/minitest.lua",
+      "source_location": "L19",
+      "id": "minitest_m_reset",
+      "community": 0
+    },
+    {
+      "label": "M.run()",
+      "file_type": "code",
+      "source_file": "tests/minitest.lua",
+      "source_location": "L23",
+      "id": "minitest_m_run",
+      "community": 0
+    },
+    {
+      "label": "test_convert.lua",
+      "file_type": "code",
+      "source_file": "tests/test_convert.lua",
+      "source_location": "L1",
+      "id": "test_convert",
+      "community": 0
+    },
+    {
+      "label": "test_paste.lua",
+      "file_type": "code",
+      "source_file": "tests/test_paste.lua",
+      "source_location": "L1",
+      "id": "test_paste",
+      "community": 2
+    },
+    {
+      "label": "test_init.lua",
+      "file_type": "code",
+      "source_file": "tests/test_init.lua",
+      "source_location": "L1",
+      "id": "test_init",
+      "community": 0
+    },
+    {
+      "label": "test_clipboard.lua",
+      "file_type": "code",
+      "source_file": "tests/test_clipboard.lua",
+      "source_location": "L1",
+      "id": "test_clipboard",
+      "community": 3
+    },
+    {
+      "label": "with_env()",
+      "file_type": "code",
+      "source_file": "tests/test_clipboard.lua",
+      "source_location": "L3",
+      "id": "test_clipboard_with_env",
+      "community": 3
+    },
+    {
+      "label": "run.lua",
+      "file_type": "code",
+      "source_file": "tests/run.lua",
+      "source_location": "L1",
+      "id": "run",
+      "community": 6
+    },
+    {
+      "label": "benchmark.lua",
+      "file_type": "code",
+      "source_file": "scripts/benchmark.lua",
+      "source_location": "L1",
+      "id": "benchmark",
+      "community": 3
+    },
+    {
+      "label": "bench()",
+      "file_type": "code",
+      "source_file": "scripts/benchmark.lua",
+      "source_location": "L6",
+      "id": "benchmark_bench",
+      "community": 3
+    },
+    {
+      "label": "native.lua",
+      "file_type": "code",
+      "source_file": "lua/yankdown/native.lua",
+      "source_location": "L1",
+      "id": "native",
+      "community": 2
+    },
+    {
+      "label": "M.paste()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/native.lua",
+      "source_location": "L3",
+      "id": "native_m_paste",
+      "community": 2
+    },
+    {
+      "label": "paste.lua",
+      "file_type": "code",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L1",
+      "id": "paste",
+      "community": 2
+    },
+    {
+      "label": "direction()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L14",
+      "id": "paste_direction",
+      "community": 2
+    },
+    {
+      "label": "warn_once()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L18",
+      "id": "paste_warn_once",
+      "community": 2
+    },
+    {
+      "label": "lines()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L30",
+      "id": "paste_lines",
+      "community": 2
+    },
+    {
+      "label": "M.insert()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L35",
+      "id": "paste_m_insert",
+      "community": 2
+    },
+    {
+      "label": "M.start()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L54",
+      "id": "paste_m_start",
+      "community": 2
+    },
+    {
+      "label": "clipboard.lua",
+      "file_type": "code",
+      "source_file": "lua/yankdown/clipboard.lua",
+      "source_location": "L1",
+      "id": "clipboard",
+      "community": 3
+    },
+    {
+      "label": "executable()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/clipboard.lua",
+      "source_location": "L3",
+      "id": "clipboard_executable",
+      "community": 3
+    },
+    {
+      "label": "M.provider()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/clipboard.lua",
+      "source_location": "L7",
+      "id": "clipboard_m_provider",
+      "community": 3
+    },
+    {
+      "label": "M.read_html()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/clipboard.lua",
+      "source_location": "L51",
+      "id": "clipboard_m_read_html",
+      "community": 3
+    },
+    {
+      "label": "convert.lua",
+      "file_type": "code",
+      "source_file": "lua/yankdown/convert.lua",
+      "source_location": "L1",
+      "id": "convert",
+      "community": 5
+    },
+    {
+      "label": "M.html_to_markdown()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/convert.lua",
+      "source_location": "L12",
+      "id": "convert_m_html_to_markdown",
+      "community": 5
+    },
+    {
+      "label": "check.lua",
+      "file_type": "code",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L1",
+      "id": "check",
+      "community": 1
+    },
+    {
+      "label": "env_set()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L14",
+      "id": "check_env_set",
+      "community": 1
+    },
+    {
+      "label": "executable()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L22",
+      "id": "check_executable",
+      "community": 1
+    },
+    {
+      "label": "add()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L26",
+      "id": "check_add",
+      "community": 1
+    },
+    {
+      "label": "probe()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L30",
+      "id": "check_probe",
+      "community": 1
+    },
+    {
+      "label": "M.clear_cache()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L105",
+      "id": "check_m_clear_cache",
+      "community": 1
+    },
+    {
+      "label": "M.check()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L111",
+      "id": "check_m_check",
+      "community": 1
+    },
+    {
+      "label": "M.ok()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L121",
+      "id": "check_m_ok",
+      "community": 1
+    },
+    {
+      "label": "M.format()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L133",
+      "id": "check_m_format",
+      "community": 1
+    },
+    {
+      "label": "M.warn_if_missing()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L157",
+      "id": "check_m_warn_if_missing",
+      "community": 1
+    },
+    {
+      "label": "init.lua",
+      "file_type": "code",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L1",
+      "id": "init",
+      "community": 4
+    },
+    {
+      "label": "map_plug()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L11",
+      "id": "init_map_plug",
+      "community": 4
+    },
+    {
+      "label": "maybe_create_commands()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L17",
+      "id": "init_maybe_create_commands",
+      "community": 4
+    },
+    {
+      "label": "intercept_buffer()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L35",
+      "id": "init_intercept_buffer",
+      "community": 4
+    },
+    {
+      "label": "maybe_intercept()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L45",
+      "id": "init_maybe_intercept",
+      "community": 4
+    },
+    {
+      "label": "M.setup()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L59",
+      "id": "init_m_setup",
+      "community": 4
+    },
+    {
+      "label": "M.paste()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L75",
+      "id": "init_m_paste",
+      "community": 4
+    },
+    {
+      "label": "M.check()",
+      "file_type": "code",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L82",
+      "id": "init_m_check",
+      "community": 4
+    }
+  ],
+  "links": [
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_check.lua",
+      "source_location": "1",
+      "weight": 1.0,
+      "_src": "test_check",
+      "_tgt": "minitest",
+      "source": "test_check",
+      "target": "minitest"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_check.lua",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_src": "test_check",
+      "_tgt": "test_check_with_env",
+      "source": "test_check",
+      "target": "test_check_with_env",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_check.lua",
+      "source_location": "362",
+      "weight": 1.0,
+      "_src": "test_check",
+      "_tgt": "check",
+      "source": "test_check",
+      "target": "check"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/minitest.lua",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "minitest",
+      "_tgt": "minitest_m_test",
+      "source": "minitest",
+      "target": "minitest_m_test",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/minitest.lua",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "minitest",
+      "_tgt": "minitest_m_eq",
+      "source": "minitest",
+      "target": "minitest_m_eq",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/minitest.lua",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "minitest",
+      "_tgt": "minitest_m_ok",
+      "source": "minitest",
+      "target": "minitest_m_ok",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/minitest.lua",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_src": "minitest",
+      "_tgt": "minitest_m_reset",
+      "source": "minitest",
+      "target": "minitest_m_reset",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/minitest.lua",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_src": "minitest",
+      "_tgt": "minitest_m_run",
+      "source": "minitest",
+      "target": "minitest_m_run",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_convert.lua",
+      "source_location": "1",
+      "weight": 1.0,
+      "_src": "test_convert",
+      "_tgt": "minitest",
+      "source": "minitest",
+      "target": "test_convert"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_paste.lua",
+      "source_location": "1",
+      "weight": 1.0,
+      "_src": "test_paste",
+      "_tgt": "minitest",
+      "source": "minitest",
+      "target": "test_paste"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_init.lua",
+      "source_location": "1",
+      "weight": 1.0,
+      "_src": "test_init",
+      "_tgt": "minitest",
+      "source": "minitest",
+      "target": "test_init"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_clipboard.lua",
+      "source_location": "1",
+      "weight": 1.0,
+      "_src": "test_clipboard",
+      "_tgt": "minitest",
+      "source": "minitest",
+      "target": "test_clipboard"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_paste.lua",
+      "source_location": "14",
+      "weight": 1.0,
+      "_src": "test_paste",
+      "_tgt": "native",
+      "source": "test_paste",
+      "target": "native"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_paste.lua",
+      "source_location": "177",
+      "weight": 1.0,
+      "_src": "test_paste",
+      "_tgt": "paste",
+      "source": "test_paste",
+      "target": "paste"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_clipboard.lua",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "test_clipboard",
+      "_tgt": "test_clipboard_with_env",
+      "source": "test_clipboard",
+      "target": "test_clipboard_with_env",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_clipboard.lua",
+      "source_location": "91",
+      "weight": 1.0,
+      "_src": "test_clipboard",
+      "_tgt": "clipboard",
+      "source": "test_clipboard",
+      "target": "clipboard"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/benchmark.lua",
+      "source_location": "3",
+      "weight": 1.0,
+      "_src": "benchmark",
+      "_tgt": "paste",
+      "source": "benchmark",
+      "target": "paste"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/benchmark.lua",
+      "source_location": "4",
+      "weight": 1.0,
+      "_src": "benchmark",
+      "_tgt": "clipboard",
+      "source": "benchmark",
+      "target": "clipboard"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/benchmark.lua",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_src": "benchmark",
+      "_tgt": "benchmark_bench",
+      "source": "benchmark",
+      "target": "benchmark_bench",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/native.lua",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "native",
+      "_tgt": "native_m_paste",
+      "source": "native",
+      "target": "native_m_paste",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_src": "paste",
+      "_tgt": "paste_direction",
+      "source": "paste",
+      "target": "paste_direction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_src": "paste",
+      "_tgt": "paste_warn_once",
+      "source": "paste",
+      "target": "paste_warn_once",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_src": "paste",
+      "_tgt": "paste_lines",
+      "source": "paste",
+      "target": "paste_lines",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_src": "paste",
+      "_tgt": "paste_m_insert",
+      "source": "paste",
+      "target": "paste_m_insert",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L54",
+      "weight": 1.0,
+      "_src": "paste",
+      "_tgt": "paste_m_start",
+      "source": "paste",
+      "target": "paste_m_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_src": "paste_m_start",
+      "_tgt": "paste_direction",
+      "source": "paste_direction",
+      "target": "paste_m_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L70",
+      "weight": 1.0,
+      "_src": "paste_m_start",
+      "_tgt": "paste_warn_once",
+      "source": "paste_warn_once",
+      "target": "paste_m_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_src": "paste_m_insert",
+      "_tgt": "paste_lines",
+      "source": "paste_lines",
+      "target": "paste_m_insert",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/paste.lua",
+      "source_location": "L83",
+      "weight": 1.0,
+      "_src": "paste_m_start",
+      "_tgt": "paste_m_insert",
+      "source": "paste_m_insert",
+      "target": "paste_m_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/clipboard.lua",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "clipboard",
+      "_tgt": "clipboard_executable",
+      "source": "clipboard",
+      "target": "clipboard_executable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/clipboard.lua",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "clipboard",
+      "_tgt": "clipboard_m_provider",
+      "source": "clipboard",
+      "target": "clipboard_m_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/clipboard.lua",
+      "source_location": "L51",
+      "weight": 1.0,
+      "_src": "clipboard",
+      "_tgt": "clipboard_m_read_html",
+      "source": "clipboard",
+      "target": "clipboard_m_read_html",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/clipboard.lua",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "clipboard_m_provider",
+      "_tgt": "clipboard_executable",
+      "source": "clipboard_executable",
+      "target": "clipboard_m_provider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/clipboard.lua",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_src": "clipboard_m_read_html",
+      "_tgt": "clipboard_m_provider",
+      "source": "clipboard_m_provider",
+      "target": "clipboard_m_read_html",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/convert.lua",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "convert",
+      "_tgt": "convert_m_html_to_markdown",
+      "source": "convert",
+      "target": "convert_m_html_to_markdown",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_src": "check",
+      "_tgt": "check_env_set",
+      "source": "check",
+      "target": "check_env_set",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_src": "check",
+      "_tgt": "check_executable",
+      "source": "check",
+      "target": "check_executable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_src": "check",
+      "_tgt": "check_add",
+      "source": "check",
+      "target": "check_add",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_src": "check",
+      "_tgt": "check_probe",
+      "source": "check",
+      "target": "check_probe",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L105",
+      "weight": 1.0,
+      "_src": "check",
+      "_tgt": "check_m_clear_cache",
+      "source": "check",
+      "target": "check_m_clear_cache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L111",
+      "weight": 1.0,
+      "_src": "check",
+      "_tgt": "check_m_check",
+      "source": "check",
+      "target": "check_m_check",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L121",
+      "weight": 1.0,
+      "_src": "check",
+      "_tgt": "check_m_ok",
+      "source": "check",
+      "target": "check_m_ok",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L133",
+      "weight": 1.0,
+      "_src": "check",
+      "_tgt": "check_m_format",
+      "source": "check",
+      "target": "check_m_format",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L157",
+      "weight": 1.0,
+      "_src": "check",
+      "_tgt": "check_m_warn_if_missing",
+      "source": "check",
+      "target": "check_m_warn_if_missing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L63",
+      "weight": 1.0,
+      "_src": "check_probe",
+      "_tgt": "check_env_set",
+      "source": "check_env_set",
+      "target": "check_probe",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_src": "check_probe",
+      "_tgt": "check_executable",
+      "source": "check_executable",
+      "target": "check_probe",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "check_probe",
+      "_tgt": "check_add",
+      "source": "check_add",
+      "target": "check_probe",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L114",
+      "weight": 1.0,
+      "_src": "check_m_check",
+      "_tgt": "check_probe",
+      "source": "check_probe",
+      "target": "check_m_check",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L122",
+      "weight": 1.0,
+      "_src": "check_m_ok",
+      "_tgt": "check_m_check",
+      "source": "check_m_check",
+      "target": "check_m_ok",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L134",
+      "weight": 1.0,
+      "_src": "check_m_format",
+      "_tgt": "check_m_check",
+      "source": "check_m_check",
+      "target": "check_m_format",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L163",
+      "weight": 1.0,
+      "_src": "check_m_warn_if_missing",
+      "_tgt": "check_m_check",
+      "source": "check_m_check",
+      "target": "check_m_warn_if_missing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/check.lua",
+      "source_location": "L147",
+      "weight": 1.0,
+      "_src": "check_m_format",
+      "_tgt": "check_m_ok",
+      "source": "check_m_ok",
+      "target": "check_m_format",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_src": "init",
+      "_tgt": "init_map_plug",
+      "source": "init",
+      "target": "init_map_plug",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_src": "init",
+      "_tgt": "init_maybe_create_commands",
+      "source": "init",
+      "target": "init_maybe_create_commands",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_src": "init",
+      "_tgt": "init_intercept_buffer",
+      "source": "init",
+      "target": "init_intercept_buffer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L45",
+      "weight": 1.0,
+      "_src": "init",
+      "_tgt": "init_maybe_intercept",
+      "source": "init",
+      "target": "init_maybe_intercept",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L59",
+      "weight": 1.0,
+      "_src": "init",
+      "_tgt": "init_m_setup",
+      "source": "init",
+      "target": "init_m_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L75",
+      "weight": 1.0,
+      "_src": "init",
+      "_tgt": "init_m_paste",
+      "source": "init",
+      "target": "init_m_paste",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L82",
+      "weight": 1.0,
+      "_src": "init",
+      "_tgt": "init_m_check",
+      "source": "init",
+      "target": "init_m_check",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L62",
+      "weight": 1.0,
+      "_src": "init_m_setup",
+      "_tgt": "init_map_plug",
+      "source": "init_map_plug",
+      "target": "init_m_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_src": "init_m_setup",
+      "_tgt": "init_maybe_create_commands",
+      "source": "init_maybe_create_commands",
+      "target": "init_m_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L54",
+      "weight": 1.0,
+      "_src": "init_maybe_intercept",
+      "_tgt": "init_intercept_buffer",
+      "source": "init_intercept_buffer",
+      "target": "init_maybe_intercept",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/yankdown/init.lua",
+      "source_location": "L64",
+      "weight": 1.0,
+      "_src": "init_m_setup",
+      "_tgt": "init_maybe_intercept",
+      "source": "init_maybe_intercept",
+      "target": "init_m_setup",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": []
+}

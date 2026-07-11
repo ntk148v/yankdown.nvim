@@ -7,7 +7,7 @@ local t = require("tests.minitest")
 --- detection and clipboard provider paths work correctly on each OS.
 ---
 --- On GitHub Actions CI:
----   - Windows runner → clipboard is unsupported (expected)
+---   - Windows runner → clipboard uses powershell (expected)
 ---   - macOS runner   → clipboard uses osascript
 ---   - Linux runner   → no display → clipboard is unsupported (expected)
 
@@ -22,10 +22,15 @@ t.test("real clipboard provider matches platform", function()
   local provider, err = require("yankdown.clipboard").provider()
 
   if is_win then
-    -- Windows: clipboard HTML read is unsupported in v1
-    t.eq(provider, nil, "Windows clipboard provider should be nil")
-    t.eq(err, "unsupported")
-    print("PLATFORM: Windows — clipboard unsupported (expected)")
+    -- Windows: clipboard uses PowerShell
+    t.ok(provider ~= nil, "Windows should have a clipboard provider")
+    if provider then
+      t.eq(provider.name, "windows")
+      t.ok(provider.command ~= nil, "provider should have a command")
+      t.eq(provider.command[1], "powershell")
+      t.eq(err, nil)
+      print("PLATFORM: Windows — clipboard uses powershell")
+    end
   elseif is_mac then
     -- macOS: osascript should be available
     t.ok(provider ~= nil, "macOS should have a clipboard provider")
@@ -58,13 +63,14 @@ t.test("real check module probes without error", function()
 
   local is_win = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
   if is_win then
-    -- On Windows, clipboard dep should be marked as not found
-    local clipboard_dep = vim.iter(deps):find(function(d)
-      return d.name == "clipboard"
+    -- On Windows, clipboard uses PowerShell
+    local ps_dep = vim.iter(deps):find(function(d)
+      return d.name == "powershell"
     end)
-    t.ok(clipboard_dep ~= nil, "Windows should have a clipboard dep entry")
-    t.eq(clipboard_dep.found, false)
-    t.eq(clipboard_dep.platform, "Windows")
+    t.ok(ps_dep ~= nil, "Windows should have a powershell dep entry")
+    -- PowerShell should be available on CI Windows runners
+    t.eq(ps_dep.found, true)
+    t.eq(ps_dep.platform, "Windows")
   end
 
   -- Format should never crash regardless of platform

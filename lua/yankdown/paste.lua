@@ -64,6 +64,10 @@ function M.start(opts, config)
     return
   end
 
+  if config.check ~= false then
+    require("yankdown.check").check()
+  end
+
   require("yankdown.clipboard").read_html(function(html, clipboard_err)
     if not html then
       if clipboard_err ~= "no-html" then

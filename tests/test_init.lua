@@ -6,6 +6,7 @@ t.test("setup keeps safe defaults", function()
   yankdown.setup()
   t.eq(yankdown._config.auto_intercept, false)
   t.eq(yankdown._config.notify, true)
+  t.eq(yankdown._config.check, "lazy")
 end)
 
 t.test("setup merges user options", function()
@@ -14,6 +15,49 @@ t.test("setup merges user options", function()
   yankdown.setup({ auto_intercept = true, notify = false })
   t.eq(yankdown._config.auto_intercept, true)
   t.eq(yankdown._config.notify, false)
+end)
+
+t.test("setup lazy check does not notify or probe at startup", function()
+  t.reset("yankdown")
+  local notices = 0
+  local probes = 0
+  local old_notify = vim.notify
+  vim.notify = function()
+    notices = notices + 1
+  end
+  package.loaded["yankdown.check"] = {
+    check = function()
+      probes = probes + 1
+      return {}
+    end,
+  }
+  require("yankdown").setup()
+  vim.notify = old_notify
+  package.loaded["yankdown.check"] = nil
+  t.eq(notices, 0)
+  t.eq(probes, 0)
+end)
+
+t.test("setup startup check probes silently", function()
+  t.reset("yankdown")
+  local notices = 0
+  local probes = 0
+  local old_notify = vim.notify
+  vim.notify = function()
+    notices = notices + 1
+  end
+  package.loaded["yankdown.check"] = {
+    check = function(opts)
+      probes = probes + 1
+      t.eq(opts.force, true)
+      return {}
+    end,
+  }
+  require("yankdown").setup({ check = "startup" })
+  vim.notify = old_notify
+  package.loaded["yankdown.check"] = nil
+  t.eq(notices, 0)
+  t.eq(probes, 1)
 end)
 
 t.test("paste delegates to paste module", function()

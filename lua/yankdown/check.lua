@@ -51,10 +51,10 @@ local function probe()
 
   if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
     add(deps, {
-      name = "clipboard",
-      found = false,
+      name = "powershell.exe",
+      found = executable("powershell.exe"),
       optional = false,
-      reason = "Windows clipboard HTML is unsupported in v1",
+      reason = "Windows clipboard HTML read",
       platform = "Windows",
     })
     return deps

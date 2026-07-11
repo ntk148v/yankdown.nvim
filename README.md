@@ -68,6 +68,7 @@ flowchart TD
 - **Multiple paste targets** — normal (after/before cursor), visual (replace selection), insert (at cursor).
 - **Optional paste interception** — `p`/`P` auto-override in Markdown buffers only (buffer-local, filetype-scoped).
 - **Plug mappings** — `<Plug>(yankdown-paste-after)` and `<Plug>(yankdown-paste-before)` for custom keybindings.
+- **Dependency check** — cached diagnostics plus `:YankdownCheck` for missing tools (`pandoc`, `xclip`, `wl-paste`, …) without noisy startup warnings.
 
 ## 5. Architecture
 
@@ -138,24 +139,27 @@ use 'ntk148v/yankdown.nvim'
 ```lua
 require("yankdown").setup({
   auto_intercept = false,  -- override p/P in Markdown buffers
-  notify = true,           -- warn once on missing tools or conversion failure
+  notify = true,           -- warn once on paste fallback/conversion failure
+  check = "lazy",          -- cache dependency check on first Markdown paste
 })
 ```
 
 Options
 
-| Key              | Default | Description                                                    |
-| ---------------- | ------- | -------------------------------------------------------------- |
-| `auto_intercept` | `false` | Buffer-local `p`/`P` override for Markdown filetype only.      |
-| `notify`         | `true`  | One-time `vim.notify` on missing tools or conversion failures. |
+| Key              | Default  | Description                                                                                                                         |
+| ---------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `auto_intercept` | `false`  | Buffer-local `p`/`P` override for Markdown filetype only.                                                                           |
+| `notify`         | `true`   | One-time `vim.notify` on paste fallback/conversion failures.                                                                        |
+| `check`          | `"lazy"` | Cache dependency status on first Markdown paste. Use `"startup"` to cache during `setup()`, or `false` to disable proactive checks. |
 
 ## 9. Usage
 
-### 9.1. Command
+### 9.1. Commands
 
 ```vim
 :YankdownPaste       " paste after cursor
 :YankdownPaste!      " paste before cursor
+:YankdownCheck       " display dependency status
 ```
 
 ### 9.2. Lua
@@ -224,4 +228,5 @@ Project layout:
 - `lua/yankdown/clipboard.lua` — platform detection, HTML clipboard read.
 - `lua/yankdown/convert.lua` — `pandoc` invocation.
 - `lua/yankdown/native.lua` — fallback native paste.
+- `lua/yankdown/check.lua` — pre-flight dependency check.
 - `tests/` — minitest-based test suite.

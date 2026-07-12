@@ -4,6 +4,26 @@ local function executable(name)
   return vim.fn.executable(name) == 1
 end
 
+local function parse_macos_html(payload)
+  if not payload or payload == "" then
+    return nil, "no-html"
+  end
+
+  local hex = payload:match("^%s*«data HTML([%x]+)»%s*$")
+  if hex then
+    local html = hex:gsub("..", function(byte)
+      return string.char(tonumber(byte, 16))
+    end)
+    return html ~= "" and html or nil, html == "" and "no-html" or nil
+  end
+
+  if payload:match("^%s*<") then
+    return payload, nil
+  end
+
+  return nil, "no-html"
+end
+
 function M.provider()
   if vim.fn.has("macunix") == 1 then
     if executable("osascript") then
@@ -12,8 +32,17 @@ function M.provider()
         command = {
           "osascript",
           "-e",
+          "try",
+          "-e",
           "the clipboard as «class HTML»",
+          "-e",
+          "on error",
+          "-e",
+          "the clipboard as text",
+          "-e",
+          "end try",
         },
+        parse = parse_macos_html,
       }
     end
     return nil, "missing:osascript"

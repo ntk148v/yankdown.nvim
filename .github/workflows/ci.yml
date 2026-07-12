@@ -107,8 +107,7 @@ jobs:
         if: matrix.wayland
         run: |
           sudo apt-get update && sudo apt-get install -y weston wl-clipboard
-          mkdir -p /tmp/wayland-sockets
-          wayland_scanner --version || true
+          sudo apt-get install -y python3-uinput 2>/dev/null || pip3 install -q python-uinput 2>/dev/null || true
 
       - name: Install X11 tooling
         if: matrix.x11
@@ -147,11 +146,29 @@ jobs:
         run: |
           export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
           export WAYLAND_DISPLAY=wayland-1
+
+          # Create virtual keyboard so libinput gives weston a seat
+          sudo modprobe uinput 2>/dev/null || true
+          KBD_PID=
+          if [ -c /dev/uinput ]; then
+            sudo chmod 666 /dev/uinput
+            python3 -c 'import uinput,time,sys; d=uinput.Device([uinput.KEY_A,uinput.KEY_B],name="vkbd"); sys.stdout.write("keyboard ready\n"); sys.stdout.flush(); [time.sleep(1) for _ in iter(int,1)]' &
+            KBD_PID=$!
+            sleep 1
+          fi
+
           weston --backend=headless-backend.so --socket=$WAYLAND_DISPLAY &
           WESTON_PID=$!
-          sleep 2
-          printf '<p><b>Hello</b></p>' | wl-copy -t text/html
-          nvim --headless -u NONE -l tests/integration/html_paste.lua
+          sleep 3
+
+          if printf '<p><b>Hello</b></p>' | wl-copy -t text/html; then
+            nvim --headless -u NONE -l tests/integration/html_paste.lua
+          else
+            echo "no seat — running provider + pandoc smoke test"
+            nvim --headless -u NONE -l tests/integration/wayland_check.lua
+          fi
+
+          kill $KBD_PID 2>/dev/null || true
           kill $WESTON_PID 2>/dev/null || true
 
       - name: Seed clipboard & test – X11

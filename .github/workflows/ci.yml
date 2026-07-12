@@ -65,3 +65,102 @@ jobs:
 
       - name: Run tests
         run: nvim --headless -u NONE -l tests/run.lua
+
+  integration:
+    name: Integration ${{ matrix.display }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            display: macOS
+          - os: windows-latest
+            display: Windows
+          - os: ubuntu-latest
+            display: Wayland
+            wayland: true
+          - os: ubuntu-latest
+            display: X11
+            x11: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
+      - name: Install pandoc
+        run: |
+          case "$RUNNER_OS" in
+            macOS) brew install pandoc ;;
+            Linux)  sudo apt-get update && sudo apt-get install -y pandoc ;;
+            Windows) choco install pandoc ;;
+          esac
+        shell: bash
+
+      - name: Install Wayland tooling
+        if: matrix.wayland
+        run: |
+          sudo apt-get update && sudo apt-get install -y weston wl-clipboard
+          mkdir -p /tmp/wayland-sockets
+          wayland_scanner --version || true
+
+      - name: Install X11 tooling
+        if: matrix.x11
+        run: sudo apt-get update && sudo apt-get install -y xclip xvfb
+
+      - name: Seed clipboard & test – macOS
+        if: runner.os == 'macOS'
+        run: |
+          osascript -e 'set the clipboard to «data HTML3C703E3C623E48656C6C6F3C2F623E3C2F703E»'
+          nvim --headless -u NONE -l tests/integration/html_paste.lua
+
+      - name: Seed clipboard & test – Windows
+        if: runner.os == 'Windows'
+        run: |
+          $fragment = '<!--StartFragment--><p><b>Hello</b></p><!--EndFragment-->'
+          $html_prefix = '<html><body>'
+          $html_suffix = '</body></html>'
+          $header_len = 110
+          $start_html = $header_len
+          $start_frag = $header_len + $html_prefix.Length
+          $end_frag = $start_frag + $fragment.Length
+          $end_html = $header_len + $html_prefix.Length + $fragment.Length + $html_suffix.Length
+          $headers = "Version:0.9`r`n" +
+                     "StartHTML:$($start_html.ToString('D10'))`r`n" +
+                     "EndHTML:$($end_html.ToString('D10'))`r`n" +
+                     "StartFragment:$($start_frag.ToString('D10'))`r`n" +
+                     "EndFragment:$($end_frag.ToString('D10'))`r`n"
+          $payload = $headers + $html_prefix + $fragment + $html_suffix
+          Add-Type -AssemblyName System.Windows.Forms
+          [System.Windows.Forms.Clipboard]::SetText($payload, [System.Windows.Forms.TextDataFormat]::Html)
+          nvim --headless -u NONE -l tests/integration/html_paste.lua
+        shell: pwsh
+
+      - name: Seed clipboard & test – Wayland
+        if: matrix.wayland
+        run: |
+          export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
+          export WAYLAND_DISPLAY=wayland-1
+          weston --backend=headless-backend.so --socket=$WAYLAND_DISPLAY &
+          WESTON_PID=$!
+          sleep 2
+          printf '<p><b>Hello</b></p>' | wl-copy -t text/html
+          nvim --headless -u NONE -l tests/integration/html_paste.lua
+          kill $WESTON_PID 2>/dev/null || true
+
+      - name: Seed clipboard & test – X11
+        if: matrix.x11
+        run: |
+          export DISPLAY=:99
+          Xvfb :99 -screen 0 1024x768x24 &
+          XVFB_PID=$!
+          sleep 1
+          printf '<p><b>Hello</b></p>' | xclip -selection clipboard -t text/html
+          nvim --headless -u NONE -l tests/integration/html_paste.lua
+          kill $XVFB_PID 2>/dev/null || true

@@ -3,7 +3,17 @@ name: CI
 on:
   push:
     branches: [master]
+    paths:
+      - "**.lua"
+      - ".github/workflows/**"
+      - ".stylua.toml"
+      - ".luacheckrc"
   pull_request:
+    paths:
+      - "**.lua"
+      - ".github/workflows/**"
+      - ".stylua.toml"
+      - ".luacheckrc"
 
 jobs:
   quality:

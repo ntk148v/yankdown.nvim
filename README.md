@@ -8,26 +8,24 @@
 
 </div>
 
-- [yankdown.nvim](#yankdownnvim)
-  - [1. Overview](#1-overview)
-  - [2. Demo](#2-demo)
-  - [3. How it works](#3-how-it-works)
-  - [4. Features](#4-features)
-  - [5. Architecture](#5-architecture)
-  - [6. Requirements](#6-requirements)
-  - [7. Installation](#7-installation)
-  - [8. Setup](#8-setup)
-  - [9. Usage](#9-usage)
-    - [9.1. Command](#91-command)
-    - [9.2. Lua](#92-lua)
-    - [9.3. Keymaps](#93-keymaps)
-    - [9.4. Plug mappings](#94-plug-mappings)
-    - [9.5. Optional paste interception](#95-optional-paste-interception)
-  - [10. Fallback behavior](#10-fallback-behavior)
-  - [11. Limitations (v1)](#11-limitations-v1)
-  - [12. Development](#12-development)
+- [Overview](#overview)
+- [Demo](#demo)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Setup](#setup)
+- [Usage](#usage)
+  - [Commands](#commands)
+  - [Lua](#lua)
+  - [Keymaps](#keymaps)
+  - [Plug mappings](#plug-mappings)
+  - [Optional paste interception](#optional-paste-interception)
+- [Fallback behavior](#fallback-behavior)
+- [How it works](#how-it-works)
+- [Architecture](#architecture)
+- [Development](#development)
 
-## 1. Overview
+## Overview
 
 We're past peak prose. Every LLM outputs Markdown. Every answer, every code review, every draft — it's all `## headings`, `- lists`, and ``` backticks. You copy from a browser, a doc, an AI chat — and Neovim gets raw HTML or rich text. Which you then clean by hand. In 2026. While your AI writes in GFM natively.
 
@@ -35,7 +33,7 @@ We're past peak prose. Every LLM outputs Markdown. Every answer, every code revi
 
 It reads HTML from the system clipboard, pipes it through `pandoc`, and inserts the result at the cursor. When HTML is unavailable or a required tool is missing, it falls back to native paste transparently.
 
-## 2. Demo
+## Demo
 
 Copy the content from <https://pandoc.org/> and simply paste using yankdown.nvim.
 
@@ -43,24 +41,7 @@ Copy the content from <https://pandoc.org/> and simply paste using yankdown.nvim
 
 _Recording generated with [VHS](https://github.com/charmbracelet/vhs) — see [`assets/demo.tape`](assets/demo.tape)._
 
-## 3. How it works
-
-```mermaid
-flowchart TD
-    A[Paste invoked] --> B{Markdown buffer?}
-    B -->|no| C[Native paste]
-    B -->|yes| D{Clipboard has HTML?}
-    D -->|no| C
-    D -->|yes| E{Platform supported?}
-    E -->|no| F[Warn once] --> C
-    E -->|yes| G[Read HTML from clipboard]
-    G --> H[Pipe through pandoc]
-    H --> I{pandoc succeeds?}
-    I -->|no| J[Warn once] --> C
-    I -->|yes| K[Insert GFM at cursor]
-```
-
-## 4. Features
+## Features
 
 - **Clipboard HTML → GFM** — paste rich content as clean Markdown, not raw HTML.
 - **Auto-fallback** — native paste when HTML is absent, pandoc is missing, or the platform is unsupported.
@@ -70,32 +51,7 @@ flowchart TD
 - **Plug mappings** — `<Plug>(yankdown-paste-after)` and `<Plug>(yankdown-paste-before)` for custom keybindings.
 - **Dependency check** — cached diagnostics plus `:YankdownCheck` for missing tools (`pandoc`, `xclip`, `wl-paste`, …) without noisy startup warnings.
 
-## 5. Architecture
-
-```mermaid
-flowchart LR
-    subgraph User
-        K[Keymap / Command]
-    end
-    subgraph yankdown.nvim
-        I[init.lua<br/>setup, command, plugs]
-        P[paste.lua<br/>orchestrator]
-        CL[clipboard.lua<br/>provider detection, HTML read]
-        CV[convert.lua<br/>pandoc wrapper]
-        N[native.lua<br/>fallback passthrough]
-    end
-    subgraph System
-        OSA[osascript / wl-paste / xclip]
-        PD[pandoc]
-    end
-
-    K --> I --> P
-    P --> CL --> OSA
-    P --> CV --> PD
-    P --> N
-```
-
-## 6. Requirements
+## Requirements
 
 | Dependency                    | Version | Purpose                                 |
 | ----------------------------- | ------- | --------------------------------------- |
@@ -111,7 +67,7 @@ Clipboard providers
 | X11      | `xclip`          |                                                |
 | Windows  | `powershell.exe` | Built-in PowerShell clipboard access (CF_HTML) |
 
-## 7. Installation
+## Installation
 
 With [lazy.nvim](https://github.com/folke/lazy.nvim):
 
@@ -134,7 +90,7 @@ With [packer.nvim](https://github.com/wbthomason/packer.nvim):
 use 'ntk148v/yankdown.nvim'
 ```
 
-## 8. Setup
+## Setup
 
 ```lua
 require("yankdown").setup({
@@ -152,9 +108,9 @@ Options
 | `notify`         | `true`   | One-time `vim.notify` on paste fallback/conversion failures.                                                                        |
 | `check`          | `"lazy"` | Cache dependency status on first Markdown paste. Use `"startup"` to cache during `setup()`, or `false` to disable proactive checks. |
 
-## 9. Usage
+## Usage
 
-### 9.1. Commands
+### Commands
 
 ```vim
 :YankdownPaste       " paste after cursor
@@ -162,14 +118,14 @@ Options
 :YankdownCheck       " display dependency status
 ```
 
-### 9.2. Lua
+### Lua
 
 ```lua
 require("yankdown").paste({ direction = "after" })
 require("yankdown").paste({ direction = "before" })
 ```
 
-### 9.3. Keymaps
+### Keymaps
 
 ```lua
 vim.keymap.set({ "n", "x", "i" }, "<leader>p", function()
@@ -177,14 +133,14 @@ vim.keymap.set({ "n", "x", "i" }, "<leader>p", function()
 end)
 ```
 
-### 9.4. Plug mappings
+### Plug mappings
 
 ```vim
 :map <leader>p <Plug>(yankdown-paste-after)
 :map <leader>P <Plug>(yankdown-paste-before)
 ```
 
-### 9.5. Optional paste interception
+### Optional paste interception
 
 Enable automatic interception of `p` and `P` in Markdown buffers:
 
@@ -196,7 +152,7 @@ require("yankdown").setup({
 
 This creates buffer-local mappings only for `filetype=markdown`. No global keys are touched.
 
-## 10. Fallback behavior
+## Fallback behavior
 
 Native paste (as if yankdown.nvim were not installed) is used when:
 
@@ -208,13 +164,50 @@ Native paste (as if yankdown.nvim were not installed) is used when:
 | Clipboard tool missing               | Warn once if `notify = true` |
 | `pandoc` missing or conversion fails | Warn once if `notify = true` |
 
-## 11. Limitations (v1)
+## How it works
 
-- Windows clipboard HTML is supported via `powershell.exe` (CF_HTML format).
-- No built-in HTML-to-Markdown converter — depends on `pandoc`.
-- Paste counts and explicit register selection fall through to native paste.
+```
+Paste invoked
+  ├─ Markdown buffer? ─── no ──→ Native paste
+  └─ yes
+      ├─ Clipboard has HTML? ─── no ──→ Native paste
+      └─ yes
+          ├─ Platform supported? ─── no ──→ Warn once → Native paste
+          └─ yes
+              ├─ Read HTML from clipboard
+              ├─ Pipe through pandoc
+              ├─ pandoc succeeds? ─── no ──→ Warn once → Native paste
+              └─ yes
+                  └─ Insert GFM at cursor
+```
 
-## 12. Development
+## Architecture
+
+```
+┌─ User ─────────────────────────────────┐
+│  Keymap / Command                       │
+└──────────┬──────────────────────────────┘
+           │
+┌──────────▼──────────────────────────────┐
+│  yankdown.nvim                          │
+│  ┌────────────────────────────────────┐ │
+│  │ init.lua    setup, command, plugs  │ │
+│  │ paste.lua   orchestrator           │ │
+│  │ clipboard.lua  provider detection  │ │
+│  │               HTML read            │ │
+│  │ convert.lua   pandoc wrapper       │ │
+│  │ native.lua    fallback passthrough │ │
+│  └────────────────────────────────────┘ │
+└──────────┬──────────────────────────────┘
+           │
+┌──────────▼──────────────────────────────┐
+│  System                                 │
+│  osascript / wl-paste / xclip / pwsh    │
+│  pandoc                                 │
+└─────────────────────────────────────────┘
+```
+
+## Development
 
 ```sh
 # Run tests

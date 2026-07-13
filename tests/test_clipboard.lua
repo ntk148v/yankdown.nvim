@@ -13,6 +13,29 @@ local function with_env(env, executable, fn)
   vim.fn.has, vim.fn.executable, vim.env = old_has, old_executable, old_env
 end
 
+local function cf_html_payload(fragment)
+  local html = table.concat({
+    "<html><body>\r\n",
+    "<!--StartFragment-->",
+    fragment,
+    "<!--EndFragment-->\r\n",
+    "</body></html>\r\n",
+  })
+  local header_template = table.concat({
+    "Version:0.9\r\n",
+    "StartHTML:%010d\r\n",
+    "EndHTML:%010d\r\n",
+    "StartFragment:%010d\r\n",
+    "EndFragment:%010d\r\n",
+  })
+  local zero_header = header_template:format(0, 0, 0, 0)
+  local start_html = #zero_header
+  local start_fragment = start_html + #"<html><body>\r\n<!--StartFragment-->"
+  local end_fragment = start_fragment + #fragment
+  local end_html = start_html + #html
+  return header_template:format(start_html, end_html, start_fragment, end_fragment) .. html
+end
+
 t.test("selects macOS osascript provider", function()
   t.reset("yankdown.clipboard")
   with_env({ has = { macunix = 1 } }, { osascript = true }, function()
@@ -58,7 +81,14 @@ t.test("selects Windows powershell provider", function()
     t.eq(provider.name, "windows")
     t.eq(provider.command[1], "powershell.exe")
     t.ok(vim.tbl_contains(provider.command, "-STA"), "uses STA for clipboard access")
-    t.ok(provider.command[#provider.command]:match("TextDataFormat%]::Html"), "requests HTML clipboard format")
+    local script = provider.command[#provider.command]
+    t.eq(provider.raw, true, "Windows CF_HTML must be byte-sensitive")
+    t.ok(script:match('RegisterClipboardFormat%("HTML Format"%)'), "requests raw CF_HTML clipboard format")
+    t.ok(script:match("GetClipboardData"), "reads clipboard format handle directly")
+    t.ok(script:match("GlobalLock"), "locks clipboard memory for byte copy")
+    t.ok(script:match("OpenStandardOutput"), "writes raw bytes to stdout")
+    t.ok(not script:match("Clipboard%]::GetText"), "does not decode HTML through Windows Forms text APIs")
+    t.ok(not script:match("UTF8%.GetBytes"), "does not re-encode already-decoded clipboard text")
     t.eq(type(provider.parse), "function", "provider carries a parse function")
   end)
 end)
@@ -167,4 +197,43 @@ t.test("read_html applies provider parse to CF_HTML stdout", function()
   t.eq(err, nil)
   t.ok(html:match("<p>Hello</p>"), "parsed HTML contains fragment content")
   t.ok(not html:match("<!--StartFragment-->"), "fragment marker stripped")
+end)
+
+t.test("read_html preserves raw CF_HTML bytes for Windows offsets", function()
+  t.reset("yankdown.clipboard")
+  local old_system = vim.system
+  local old_schedule = vim.schedule
+  vim.schedule = function(fn)
+    fn()
+  end
+
+  local cf_html = cf_html_payload("<p>Windows — café</p>")
+  vim.system = function(cmd, opts, on_exit)
+    t.eq(opts.text, false, "Windows CF_HTML must not run through text mode")
+    local stdout = opts.text and cf_html:gsub("\r\n", "\n") or cf_html
+    on_exit({ code = 0, stdout = stdout, stderr = "" })
+    return {}
+  end
+
+  local clipboard = require("yankdown.clipboard")
+  local old_provider = clipboard.provider
+  clipboard.provider = function()
+    return {
+      name = "windows",
+      command = { "powershell.exe" },
+      raw = true,
+      parse = require("yankdown.cf_html").parse,
+    }
+  end
+
+  local html, err
+  clipboard.read_html(function(result, reason)
+    html, err = result, reason
+  end)
+
+  clipboard.provider = old_provider
+  vim.system = old_system
+  vim.schedule = old_schedule
+  t.eq(err, nil)
+  t.eq(html, "<p>Windows — café</p>")
 end)

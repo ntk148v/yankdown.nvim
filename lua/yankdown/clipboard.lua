@@ -60,9 +60,43 @@ function M.provider()
           "-STA",
           "-Command",
           table.concat({
-            "Add-Type -AssemblyName System.Windows.Forms;",
-            [=[$html = [System.Windows.Forms.Clipboard]::GetText([System.Windows.Forms.TextDataFormat]::Html);]=],
-            [=[if ($html) { $bytes = [System.Text.Encoding]::UTF8.GetBytes($html); $stdout = [Console]::OpenStandardOutput(); $stdout.Write($bytes, 0, $bytes.Length) }]=],
+            [[Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class YankdownClipboard {
+  [DllImport("user32.dll", SetLastError=true)] static extern bool OpenClipboard(IntPtr hWndNewOwner);
+  [DllImport("user32.dll", SetLastError=true)] static extern bool CloseClipboard();
+  [DllImport("user32.dll", SetLastError=true, CharSet=CharSet.Auto)] static extern uint RegisterClipboardFormat(string lpszFormat);
+  [DllImport("user32.dll", SetLastError=true)] static extern IntPtr GetClipboardData(uint uFormat);
+  [DllImport("kernel32.dll", SetLastError=true)] static extern IntPtr GlobalLock(IntPtr hMem);
+  [DllImport("kernel32.dll", SetLastError=true)] static extern bool GlobalUnlock(IntPtr hMem);
+  [DllImport("kernel32.dll", SetLastError=true)] static extern UIntPtr GlobalSize(IntPtr hMem);
+  public static byte[] GetHtml() {
+    uint format = RegisterClipboardFormat("HTML Format");
+    if (format == 0 || !OpenClipboard(IntPtr.Zero)) return null;
+    try {
+      IntPtr handle = GetClipboardData(format);
+      if (handle == IntPtr.Zero) return null;
+      IntPtr pointer = GlobalLock(handle);
+      if (pointer == IntPtr.Zero) return null;
+      try {
+        int size = (int)GlobalSize(handle);
+        if (size <= 0) return null;
+        byte[] bytes = new byte[size];
+        Marshal.Copy(pointer, bytes, 0, size);
+        if (bytes.Length > 0 && bytes[bytes.Length - 1] == 0) Array.Resize(ref bytes, bytes.Length - 1);
+        return bytes;
+      } finally {
+        GlobalUnlock(handle);
+      }
+    } finally {
+      CloseClipboard();
+    }
+  }
+}
+'@;]],
+            [=[$bytes = [YankdownClipboard]::GetHtml();]=],
+            [=[if ($bytes) { $stdout = [Console]::OpenStandardOutput(); $stdout.Write($bytes, 0, $bytes.Length) }]=],
           }, " "),
         },
         parse = require("yankdown.cf_html").parse,

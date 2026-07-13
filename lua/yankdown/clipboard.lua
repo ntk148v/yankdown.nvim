@@ -52,6 +52,7 @@ function M.provider()
     if executable("powershell.exe") then
       return {
         name = "windows",
+        raw = true,
         command = {
           "powershell.exe",
           "-NoProfile",
@@ -102,7 +103,7 @@ function M.read_html(callback)
     return
   end
 
-  vim.system(provider.command, { text = true }, function(result)
+  vim.system(provider.command, { text = not provider.raw }, function(result)
     vim.schedule(function()
       if result.code ~= 0 then
         callback(nil, "clipboard-failed")

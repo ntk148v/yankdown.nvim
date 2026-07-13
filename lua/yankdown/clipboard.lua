@@ -61,7 +61,7 @@ function M.provider()
           table.concat({
             "Add-Type -AssemblyName System.Windows.Forms;",
             [=[$html = [System.Windows.Forms.Clipboard]::GetText([System.Windows.Forms.TextDataFormat]::Html);]=],
-            [=[if ($html) { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; [Console]::Write($html) }]=],
+            [=[if ($html) { $bytes = [System.Text.Encoding]::UTF8.GetBytes($html); $stdout = [Console]::OpenStandardOutput(); $stdout.Write($bytes, 0, $bytes.Length) }]=],
           }, " "),
         },
         parse = require("yankdown.cf_html").parse,

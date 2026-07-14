@@ -37,9 +37,11 @@ It reads HTML from the system clipboard, pipes it through `pandoc`, and inserts 
 
 Copy the content from <https://pandoc.org/> and simply paste using yankdown.nvim.
 
-![demo](assets/demo.gif)
+![demo](assets/demo-vhs.gif)
 
 _Recording generated with [VHS](https://github.com/charmbracelet/vhs) — see [`assets/demo.tape`](assets/demo.tape)._
+
+![demo](assets/demo.gif)
 
 ## Features
 

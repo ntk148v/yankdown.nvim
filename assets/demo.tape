@@ -11,29 +11,38 @@ Set PlaybackSpeed 1.5
 
 # Setup
 Hide
-  Type "curl -sL https://pandoc.org/ > /tmp/pandoc_org.html"
+  Type "rm -f /tmp/yankdown-demo.md /tmp/pandoc_org.html"
   Enter
-  Sleep 2s
-  Type "export PATH=/tmp:$PATH"
+  Type "copy_from_browser() { curl -sL $1 > /tmp/pandoc_org.html && { { command -v wl-copy >/dev/null && wl-copy --type text/html < /tmp/pandoc_org.html; } || { command -v xclip >/dev/null && xclip -selection clipboard -t text/html -i /tmp/pandoc_org.html; }; }; }"
   Enter
   Sleep 200ms
   Type "clear"
   Enter
 Show
 
-Type "echo 'yankdown.nvim: paste HTML as GitHub Flavored Markdown'"
+Type "echo 'yankdown.nvim: paste browser HTML as GitHub Flavored Markdown'"
 Enter
 Sleep 1s
 
 Type "echo"
 Enter
-Type "echo '1. pandoc.org homepage copied to clipboard (links, code blocks, tables)'"
+Type "echo '1. Open https://pandoc.org/ in the browser'"
+Enter
+Type "python3 -m webbrowser https://pandoc.org/"
 Enter
 Sleep 1s
 
 Type "echo"
 Enter
-Type "echo '2. Opening Neovim... paste via yankdown auto-conversion'"
+Type "echo '2. Copy the page content from the browser'"
+Enter
+Type "copy_from_browser https://pandoc.org/"
+Enter
+Sleep 1s
+
+Type "echo"
+Enter
+Type "echo '3. Paste into Neovim with yankdown.nvim'"
 Enter
 Sleep 1s
 

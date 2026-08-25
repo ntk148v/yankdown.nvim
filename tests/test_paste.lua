@@ -35,7 +35,7 @@ t.test("non-markdown buffer uses native paste", function()
   package.loaded["yankdown.native"] = nil
 end)
 
-t.test("insert normal after uses linewise put after cursor", function()
+t.test("insert normal after uses characterwise put after cursor", function()
   t.reset("yankdown.paste")
   local old_mode, old_put = vim.api.nvim_get_mode, vim.api.nvim_put
   local call
@@ -49,11 +49,11 @@ t.test("insert normal after uses linewise put after cursor", function()
   vim.api.nvim_get_mode, vim.api.nvim_put = old_mode, old_put
   t.eq(call.lines[1], "# Hello")
   t.eq(call.lines[2], "World")
-  t.eq(call.type, "l")
+  t.eq(call.type, "c")
   t.eq(call.after, true)
 end)
 
-t.test("insert normal before uses linewise put before cursor", function()
+t.test("insert normal before uses characterwise put before cursor", function()
   t.reset("yankdown.paste")
   local old_mode, old_put = vim.api.nvim_get_mode, vim.api.nvim_put
   local call
@@ -65,6 +65,7 @@ t.test("insert normal before uses linewise put before cursor", function()
   end
   require("yankdown.paste").insert("Hello", "before")
   vim.api.nvim_get_mode, vim.api.nvim_put = old_mode, old_put
+  t.eq(call.type, "c")
   t.eq(call.after, false)
 end)
 

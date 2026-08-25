@@ -49,7 +49,7 @@ function M.insert(markdown, dir)
     return
   end
 
-  vim.api.nvim_put(out, "l", dir ~= "before", true)
+  vim.api.nvim_put(out, "c", dir ~= "before", true)
 end
 
 function M.start(opts, config)

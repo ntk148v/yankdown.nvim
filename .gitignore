@@ -52,3 +52,4 @@ tags
 .pi-subagents/
 docs/superpowers/
 graphify-out/
+.worktrees/
